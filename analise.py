@@ -824,8 +824,8 @@ else:
 #Modelo Poisson
 df_poisson = pd.DataFrame({
     'Community Area': criminosos_por_area.index,
-    'Total Crimes Sexuais': crimes_sexuais.groupby('Community Area').size().reindex(criminosos_por_area.index, fill_value=0),
-    'Total Crimes': crimes.groupby('Community Area',observed=False).size().reindex(criminosos_por_area.index, fill_value=0)
+    'Total Crimes Sexuais': crimes_sexuais.groupby('Community Area', observed=False).size().reindex(criminosos_por_area.index, fill_value=0),
+    'Total Crimes': crimes.groupby('Community Area', observed=False).size().reindex(criminosos_por_area.index, fill_value=0)
 })
 df_poisson['Mais de 1 Criminoso'] = (criminosos_por_area > 1).astype(int).values
 df_poisson['Offset'] = np.log(df_poisson['Total Crimes'])
