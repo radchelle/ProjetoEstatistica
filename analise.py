@@ -119,14 +119,14 @@ data_atual = pd.to_datetime("today")
 sex_offenders['IDADE'] = (data_atual - sex_offenders['BIRTH DATE']).dt.days // 365
 print()
 # Separação de criminosos onde 'VICTIM MINOR'== Y
-infratores_vitima_menor = sex_offenders[sex_offenders['VICTIM MINOR'] == 'Y']
+criminosos_vitima_menor = sex_offenders[sex_offenders['VICTIM MINOR'] == 'Y']
 # Separação de criminosos onde 'VICTIM MINOR'== N
-infratores_sem_vitima_menor = sex_offenders[sex_offenders['VICTIM MINOR'] == 'N']
+criminosos_sem_vitima_menor = sex_offenders[sex_offenders['VICTIM MINOR'] == 'N']
 # Histograma sobreposto dos grupos (com e sem vítima)
 plt.figure(figsize=(12, 7))
-plt.hist(infratores_vitima_menor['IDADE'], bins=range(0, 101, 10),
+plt.hist(criminosos_vitima_menor['IDADE'], bins=range(0, 101, 10),
          alpha=0.6, label='Com vítima menor', color='salmon', edgecolor='black')
-plt.hist(infratores_sem_vitima_menor['IDADE'], bins=range(0, 101, 10),
+plt.hist(criminosos_sem_vitima_menor['IDADE'], bins=range(0, 101, 10),
          alpha=0.6, label='Sem vítima menor', color='green', edgecolor='black')
 plt.title('Distribuição Etária de Criminosos Sexuais\nCom e Sem Vítimas Menores')
 plt.xlabel('Idade')
@@ -164,16 +164,16 @@ from scipy.stats import chi2_contingency
 
 #Identificação dos perfis dos criminosos sexuais com vítimas menores de idade
 print("Perfil demográfico de Criminosos COM vítimas menores de idade: ")
-infratores_vitima_menor = sex_offenders[sex_offenders['VICTIM MINOR'] == 'Y']
-genero_contagem = infratores_vitima_menor['GENDER'].value_counts()
+criminosos_vitima_menor = sex_offenders[sex_offenders['VICTIM MINOR'] == 'Y']
+genero_contagem = criminosos_vitima_menor['GENDER'].value_counts()
 print(genero_contagem)
 print()
-raça_contagem = infratores_vitima_menor['RACE'].value_counts()
+raça_contagem = criminosos_vitima_menor['RACE'].value_counts()
 print(raça_contagem)
 print()
 tabela_genero_raca = pd.crosstab(
-    infratores_vitima_menor['GENDER'],
-    infratores_vitima_menor['RACE'],
+    criminosos_vitima_menor['GENDER'],
+    criminosos_vitima_menor['RACE'],
     normalize='index'
 ) * 100
 display(
@@ -183,18 +183,18 @@ display(
 print()
 #Identificação dos perfis dos criminosos sexuais sem vítimas menores de idade
 print("Perfil demográfico de Criminosos SEM vítimas menores de idade: ")
-infratores_sem_vitima_menor = sex_offenders[sex_offenders['VICTIM MINOR'] == 'N']
-genero_contagem = infratores_sem_vitima_menor['GENDER'].value_counts()
+criminoso_sem_vitima_menor = sex_offenders[sex_offenders['VICTIM MINOR'] == 'N']
+genero_contagem = criminoso_sem_vitima_menor['GENDER'].value_counts()
 print("\nDistribuição por Gênero:")
 print(genero_contagem)
 print()
-raca_contagem = infratores_sem_vitima_menor['RACE'].value_counts()
+raca_contagem = criminoso_sem_vitima_menor['RACE'].value_counts()
 print("\nDistribuição por Raça:")
 print(raca_contagem)
 print()
 tabela_genero_raca = pd.crosstab(
-    infratores_sem_vitima_menor['GENDER'],
-    infratores_sem_vitima_menor['RACE'],
+    criminoso_sem_vitima_menor['GENDER'],
+    criminoso_sem_vitima_menor['RACE'],
     normalize='index',
     dropna=False
 ) * 100
@@ -240,10 +240,10 @@ data_atual = pd.to_datetime("today")
 sex_offenders['IDADE'] = (data_atual - sex_offenders['BIRTH DATE']).dt.days // 365
 print()
 # Separação de criminosos onde 'VICTIM MINOR'== Y
-infratores_vitima_menor = sex_offenders[sex_offenders['VICTIM MINOR'] == 'Y']
+criminosos_vitima_menor = sex_offenders[sex_offenders['VICTIM MINOR'] == 'Y']
 #Histograma
 plt.figure(figsize=(10,6))
-plt.hist(infratores_vitima_menor['IDADE'], bins=range(0, 101, 10), color='salmon', edgecolor='black')
+plt.hist(criminosos_vitima_menor['IDADE'], bins=range(0, 101, 10), color='salmon', edgecolor='black')
 plt.title('Distribuição por Faixa Etária dos Criminosos Sexuais com Vítimas Menores')
 plt.xlabel('Idade')
 plt.ylabel('Número de Criminosos Sexuais')
@@ -252,7 +252,7 @@ plt.tight_layout()
 plt.show()
 print()
 # Distribuição geográfica desses criminosos
-contagem_faixas_area = infratores_vitima_menor['Community Area'].value_counts().sort_index()
+contagem_faixas_area = criminosos_vitima_menor['Community Area'].value_counts().sort_index()
 plt.figure(figsize=(16, 8))
 contagem_faixas_area.plot(kind='bar', color='red')
 plt.title('Distribuição Geográfica (Community Areas) dos Criminosos Sexuais com Vítimas Menores')
@@ -264,6 +264,7 @@ plt.show()
 
 """# Quais são as "Community Areas" com maior número de criminosos sexuais? Quais tipos de crimes são mais comuns nessas áreas? Qual o perfil demográfico (raça, gênero) dos infratores que vivem nessas áreas?"""
 
+criminosos_validos= sex_offenders.dropna(subset=['Community Area'])
 criminosos_por_area = criminosos_validos['Community Area'].value_counts().sort_index()
 media_criminosos_por_area= criminosos_por_area.mean()
 print('Média de criminosos por Community Area:', media_criminosos_por_area)
@@ -290,8 +291,8 @@ plt.show()
 
 import matplotlib.pyplot as plt
 
+criminosos_por_area = criminosos_validos['Community Area'].value_counts().sort_index()
 limiar_alta_concentracao = criminosos_por_area.quantile(0.75)
-
 # Tabela com 'Community Areas' com n° de criminosos> limiar_alta_concentracao
 areas_alta_concentracao = criminosos_por_area[criminosos_por_area > limiar_alta_concentracao]
 
@@ -399,6 +400,8 @@ plt.show()
 import matplotlib.pyplot as plt
 
 #Separação das áreas por alta ou baixa concentração de criminosos sexuais registrados
+criminosos_validos= sex_offenders.dropna(subset=['Community Area'])
+criminosos_por_area = criminosos_validos['Community Area'].value_counts().sort_index()
 limiar_alta_concentracao = criminosos_por_area.quantile(0.75)
 areas_alta_concentracao = criminosos_por_area[criminosos_por_area > limiar_alta_concentracao].index
 areas_baixa_concentracao = criminosos_por_area[criminosos_por_area <= limiar_alta_concentracao].index
@@ -440,6 +443,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import chi2_contingency
 
+crimes_validos = crimes.dropna(subset=['Community Area'])
 tipos_sexuais = ['SEX OFFENSE','CRIMINAL SEXUAL ASSAULT','CRIM SEXUAL ASSAULT']
 crimes_sexuais = crimes_validos[crimes_validos['Primary Type'].isin(tipos_sexuais)]
 contagem_crimes_sexuais = crimes_sexuais['Community Area'].value_counts()
@@ -481,6 +485,7 @@ print(f"\nResultado do Teste Qui-Quadrado:")
 print(f"Estatística Qui-Quadrado: {chi2}")
 print(f"p-valor: {p}")
 print(f"Graus de Liberdade: {dof}")
+print(f"Frequências esperadas:\n{expected}")
 
 alpha = 0.05
 if p_value < alpha:
@@ -493,6 +498,7 @@ else:
 """
 
 # Separação das "Community Areas" comparando com a mediana
+criminosos_validos= sex_offenders.dropna(subset=['Community Area'])
 criminosos_por_area = criminosos_validos['Community Area'].value_counts().sort_index()
 mediana_criminosos_por_area= criminosos_por_area.median()
 print('Mediana de criminosos por Community Area:', mediana_criminosos_por_area)
@@ -527,6 +533,7 @@ else:
 
 import matplotlib.pyplot as plt
 #Contagem do número de crimes sexuais
+crimes_validos = crimes.dropna(subset=['Community Area'])
 tipos_sexuais = ['SEX OFFENSE','CRIMINAL SEXUAL ASSAULT','CRIM SEXUAL ASSAULT']
 crimes_sexuais = crimes_validos[crimes_validos['Primary Type'].isin(tipos_sexuais)]
 #Contagem do número de crimes não sexuais
@@ -566,6 +573,7 @@ plt.show()
 """# Qual a variação dos crimes sexuais em relação ao total de crimes anualmente em Chicago?"""
 
 import matplotlib.pyplot as plt
+from scipy.stats import chi2_contingency
 
 #Filtragem dos tipos de crimes (sexuais e nao sexuais)
 tipos_sexuais = ['SEX OFFENSE', 'CRIMINAL SEXUAL ASSAULT', 'CRIM SEXUAL ASSAULT']
@@ -599,6 +607,25 @@ plt.grid(True, linestyle='--', alpha=0.7)
 plt.xticks(df_proporcao.index, rotation=45)
 plt.tight_layout()
 plt.show()
+print("\n")
+tabela = []
+for ano in df_proporcao.index:
+    sexuais = df_proporcao.loc[ano, 'Crimes Sexuais']
+    nao_sexuais = df_proporcao.loc[ano, 'Total de Crimes'] - sexuais
+    tabela.append([sexuais, nao_sexuais])
+
+chi2, p, dof, expected = chi2_contingency(tabela)
+print("\nTeste Qui-Quadrado:")
+print(f"Qui²: {chi2}")
+print(f"p-valor: {p}")
+print(f"Graus de liberdade: {dof}")
+print(f"Frequências esperadas:\n{expected}")
+
+alpha = 0.05
+if p < alpha:
+    print("Resultado: Rejeita-se a hipótese nula (H₀). Há diferença significativa nas proporções de crimes sexuais entre os anos.")
+else:
+    print("Resultado: Não se rejeita a hipótese nula (H₀). Não há diferença significativa nas proporções de crimes sexuais entre os anos.")
 
 """# Existe alguma relação entre a taxa de prisão para crimes sexuais e para crimes gerais?
 
@@ -699,6 +726,8 @@ else:
 from scipy.stats import shapiro, mannwhitneyu
 
 #Cálculo de crimes em áreas com uma concentração 'BAIXA' de criminosos sexuais
+criminosos_validos= sex_offenders.dropna(subset=['Community Area'])
+criminosos_por_area = criminosos_validos['Community Area'].value_counts().sort_index()
 limiar_alta_concentracao = criminosos_por_area.quantile(0.75)
 areas_baixa_concentracao = criminosos_por_area[criminosos_por_area <= limiar_alta_concentracao].index
 crimes_nas_areas_baixa = crimes[crimes['Community Area'].isin(areas_baixa_concentracao)]
@@ -745,7 +774,12 @@ else:
 
 from scipy.stats import chi2_contingency
 import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import numpy as np
 
+
+criminosos_validos= sex_offenders.dropna(subset=['Community Area'])
+criminosos_por_area = criminosos_validos['Community Area'].value_counts().sort_index()
 #Separação das áreas com mais ou menos de 1 criminoso sexual registrado
 areas_mais_de_um_criminoso = criminosos_por_area[criminosos_por_area > 1].index
 areas_um_ou_menos_criminosos = criminosos_por_area[criminosos_por_area <= 1].index
@@ -763,8 +797,8 @@ total_crimes_sexuais = len(crimes_sexuais)
 
 prob_maior = total_crimes_maior / total_crimes_sexuais
 prob_menor = total_crimes_menor / total_crimes_sexuais
-print(f"Probabilidade de um crime sexual ocorrer em “Community Areas” com mais de 1 criminoso registrado: {prob_maior:.2f}")
-print(f"Probabilidade de um crime sexual ocorrer em “Community Areas” com 1 ou nenhum criminoso registrado: {prob_menor:.2f}")
+print(f"Proporção de crimes sexuais em “Community Areas” com mais de 1 criminoso registrado: {prob_maior:.2f}")
+print(f"Proporção de crimes sexuais em “Community Areas” com 1 ou nenhum criminoso registrado: {prob_menor:.2f}")
 
 #Tabela Contigência para o teste
 tabela = [
@@ -779,6 +813,7 @@ print(f"\nTeste Qui-Quadrado:")
 print(f"Estatística Qui²: {chi2}")
 print(f"P-valor: {p_value}")
 print(f"Graus de liberdade: {dof}")
+print(f"Frequências esperadas:\n{expected}")
 
 alpha = 0.05
 if p_value < alpha:
@@ -786,40 +821,94 @@ if p_value < alpha:
 else:
     print("Resultado: Não se rejeita a hipótese nula (H₀).As proporções são iguais ou a proporção na área com mais criminosos não é maior. \n")
 
+#Modelo Poisson
+df_poisson = pd.DataFrame({
+    'Community Area': criminosos_por_area.index,
+    'Total Crimes Sexuais': crimes_sexuais.groupby('Community Area').size().reindex(criminosos_por_area.index, fill_value=0),
+    'Total Crimes': crimes.groupby('Community Area',observed=False).size().reindex(criminosos_por_area.index, fill_value=0)
+})
+df_poisson['Mais de 1 Criminoso'] = (criminosos_por_area > 1).astype(int).values
+df_poisson['Offset'] = np.log(df_poisson['Total Crimes'])
+
+modelo_poisson = sm.GLM(
+    df_poisson['Total Crimes Sexuais'],
+    sm.add_constant(df_poisson['Mais de 1 Criminoso']),
+    family=sm.families.Poisson(),
+    offset=df_poisson['Offset']
+).fit()
+
+print("\nModelo de Poisson - Efeito de Áreas com Mais de 1 Criminoso Registrado sobre a Taxa de Crimes Sexuais (ajustado pelo total de crimes):")
+print(modelo_poisson.summary())
+risco_relativo = np.exp(modelo_poisson.params['Mais de 1 Criminoso'])
+print(f"\nRisco Relativo (taxa de crimes sexuais nas áreas com mais de 1 criminoso em relação às demais): {risco_relativo:.2f}")
+
 """# A probabilidade de um crime sexual ocorrer em uma "Community Area" com alta concentração de criminosos sexuais registrados é significativamente maior do que em uma "Community Area" com baixa concentração de criminosos sexuais registrados?
 
 """
 
-from statsmodels.stats.proportion import proportions_ztest
+from scipy.stats import chi2_contingency
+from scipy.stats import binom
 
+criminosos_validos= sex_offenders.dropna(subset=['Community Area'])
+criminosos_por_area = criminosos_validos['Community Area'].value_counts().sort_index()
 #Identificação e separação das áreas com alta ou baixa concentração de criminosos sexuais
 tipos_sexuais = ['SEX OFFENSE', 'CRIMINAL SEXUAL ASSAULT', 'CRIM SEXUAL ASSAULT']
 limiar_alta_concentracao = criminosos_por_area.quantile(0.75)
 areas_alta = criminosos_por_area[criminosos_por_area > limiar_alta_concentracao].index
 areas_baixa = criminosos_por_area[criminosos_por_area <= limiar_alta_concentracao].index
-#Filtragem dos crimes por "Community Area"
+#Filtragem dos crimes por "Community Area" e concentração
 crimes_alta = crimes[crimes['Community Area'].isin(areas_alta)]
 crimes_baixa = crimes[crimes['Community Area'].isin(areas_baixa)]
-#Cálculo da proporção: Número de crimes sexuais/total de crimes em áreas alta concentração
+#Cálcula proporção de crimes sexuais/ crimes gerais em áreas de alta concentração
 sexuais_alta = crimes_alta['Primary Type'].isin(tipos_sexuais).sum()
+nao_sexuais_alta = len(crimes_alta) - sexuais_alta
 total_alta = len(crimes_alta)
 prop_alta = sexuais_alta / total_alta
-#Cálculo da proporção: Número de crimes sexuais/total de crimes em áreas baixa concentração
+#Cálcula proporção de crimes sexuais/ crimes gerais em áreas de baixa concentração
 sexuais_baixa = crimes_baixa['Primary Type'].isin(tipos_sexuais).sum()
+nao_sexuais_baixa = len(crimes_baixa) - sexuais_baixa
 total_baixa = len(crimes_baixa)
 prop_baixa = sexuais_baixa / total_baixa
-print(f"Probabilidade crimes sexuais em áreas de alta concentração: {prop_alta:.4f}")
-print(f"Probabilidade crimes sexuais em áreas de baixa concentração: {prop_baixa:.4f}")
-# Teste Z
-counts = [sexuais_alta, sexuais_baixa]
-nobs = [total_alta, total_baixa]
-stat, p = proportions_ztest(counts, nobs, alternative='larger')
-print(f"\nTeste Z para as duas áreas:")
-print(f"Estatística Z = {stat}")
+print(f"Proporção de crimes sexuais em áreas de alta concentração: {prop_alta:.4f}")
+print(f"Proporção de crimes sexuais em áreas de baixa concentração: {prop_baixa:.4f}")
+# Tabela de contingência
+tabela_contingencia = [
+    [sexuais_alta, nao_sexuais_alta],
+    [sexuais_baixa, nao_sexuais_baixa]
+]
+
+tabela_contingencia_df = pd.DataFrame(
+    tabela_contingencia,
+    columns=['Crimes Sexuais', 'Crimes Não Sexuais'],
+    index=['Alta Concentração', 'Baixa Concentração']
+)
+# Teste Qui-Quadrado
+chi2, p, dof, expected = chi2_contingency(tabela_contingencia)
+
+print("Tabela de Contingência:")
+print(tabela_contingencia_df)
+print("\nTeste Qui-Quadrado:")
+print(f"Qui² = {chi2}")
 print(f"p-valor = {p}")
+print(f"GL = {dof}")
+print(f"Frequências esperadas:\n{expected}")
 
 alpha = 0.05
 if p < alpha:
-    print("Resultado: Rejeita-se a hipótese nula (H₀). A probabilidade de ocorrer um crime sexual em áreas com alta concentração de criminosos sexuais registrados é menor à probabilidade em áreas com baixa concentração.\n")
+    print("\nResultado: Rejeita-se H₀. Há associação significativa entre tipo de área (alta/baixa concentração) e ocorrência de crime sexual.")
 else:
-    print("Resultado: Não se rejeita a hipótese nula (H₀). A probabilidade de ocorrer um crime sexual em áreas com alta concentração é maior do que em áreas com baixa concentração.\n")
+    print("\nResultado: Não se rejeita H₀. Não há evidência de associação entre o tipo de área e ocorrência de crime sexual.")
+print("\n")
+#Modelo binominal Áreas Alta
+n = 1000
+k = 1
+p = prop_alta
+probabilidade = binom.pmf(k, n, p)
+print(f"Probabilidade de ocorrer exatamente 1 crime sexual em {n} crimes (Alta Concentração): {probabilidade:.6f}")
+print()
+#Modelo binominal Áreas Baixa
+n = 1000
+k = 1
+p = prop_baixa
+probabilidade = binom.pmf(k, n, p)
+print(f"Probabilidade de ocorrer exatamente 1 crime sexual em {n} crimes (Baixa Concentração): {probabilidade:.6f}")
