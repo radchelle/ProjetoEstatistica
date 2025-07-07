@@ -104,8 +104,13 @@ print()
 print("Teste de Normalidade (Shapiro-Wilk):")
 stat, p_value = shapiro(criminosos_por_area.values)
 print(f"Estatística: {stat:.4f}, p-valor: {p_value}")
-
 print()
+
+alpha = 0.05
+if p_value < alpha:
+    print("Resultado: Hipótese nula (H₀) reijeitada. A distribuição NÃO é normal.\n")
+else:
+    print("Resultado: Hipótese nula (H₀) não pode ser rejeitada. A distribuição pode ser considerada normal.\n")
 
 """# Qual a idade dos criminosos sexuais registrados com vítima menor em relação aos registrados sem vítima menor?"""
 
@@ -148,6 +153,12 @@ print(f"\nTeste do Qui-Quadrado:")
 print(f"Estatística Qui² = {chi2}")
 print(f"p-valor = {p_value}")
 print(f"Graus de liberdade = {dof}")
+
+alpha = 0.05
+if p_value < alpha:
+    print("Resultado: Hipótese nula (H₀) rejeitada. Há evidências de associação entre faixa etária e o fato da vítima ser menor.\n")
+else:
+    print("Resultado: Hipótese nula (H₀) não pode ser rejeitada. Não há evidências de associação entre faixa etária e o fato da vítima ser menor.\n")
 
 """# Qual é a raça e o gênero dos infratores sexuais que tiveram vítimas menores? Existem diferenças notáveis nesses perfis em comparação com infratores que não tiveram vítimas menores?"""
 
@@ -204,6 +215,12 @@ stat, p, dof, expected = chi2_contingency(tabela_genero)
 print(f"\nTeste Qui-Quadrado (Gênero x Vítima Menor):")
 print(f"Estatística Qui²: {stat}, p-valor: {p}, graus de liberdade: {dof}")
 print()
+alpha = 0.05
+if p_value < alpha:
+    print("Resultado: Hipótese nula (H₀) rejeitada. Há diferença notável nos perfis de gênero de criminosos com vítima menor e criminosos sem vítima menor.\n")
+else:
+    print("Resultado: Hipótese nula (H₀) não pode ser rejeitada. Não há diferença notável nos perfis de gênero de criminosos com vítima menor e criminosos sem vítima menor.\n")
+
 # Teste Qui-Quadrado - Raça x Vítima Menor
 tabela_raca = pd.crosstab(sex_offenders['RACE'], sex_offenders['VICTIM MINOR'])
 print("\nTabela de contingência - Raça x Vítima Menor:")
@@ -211,6 +228,12 @@ print(tabela_raca)
 stat, p, dof, expected = chi2_contingency(tabela_raca)
 print(f"\nTeste Qui-Quadrado (Raça x Vítima Menor):")
 print(f"Estatística Qui²: {stat}, p-valor: {p}, graus de liberdade: {dof}")
+
+alpha = 0.05
+if p_value < alpha:
+    print("Resultado: Hipótese nula (H₀) rejeitada. Há diferença notável nos perfis de raça de criminosos com vítima menor e criminosos sem vítima menor.\n")
+else:
+    print("Resultado: Hipótese nula (H₀) não pode ser rejeitada. Não há diferença notável nos perfis de raça de criminosos com vítima menor e criminosos sem vítima menor.\n")
 
 """# Quais faixas etárias de criminosos sexuais estão mais associadas a vítimas menores e como elas se distribuem geograficamente por Community Area?"""
 
@@ -457,6 +480,47 @@ print(f"Estatística Qui-Quadrado: {chi2}")
 print(f"p-valor: {p}")
 print(f"Graus de Liberdade: {dof}")
 
+alpha = 0.05
+if p_value < alpha:
+    print("Resultado: Hipótese nula (H₀) rejeitada. Existe associação entre o tipo de crime e a categoria da área.\n")
+else:
+    print("Resultado: Hipótese nula (H₀) não pode ser rejeitada.Não há associação entre o tipo de crime e a categoria da área (alta ou baixa incidência de crimes sexuais).\n")
+
+"""# Qual a probabilidade de um crime ocorrer em uma “Community Area” que possui um número de criminosos sexuais maior que a mediana?
+
+"""
+
+# Separação das "Community Areas" comparando com a mediana
+criminosos_por_area = criminosos_validos['Community Area'].value_counts().sort_index()
+mediana_criminosos_por_area= criminosos_por_area.median()
+print('Mediana de criminosos por Community Area:', mediana_criminosos_por_area)
+# Seleção das areas com número de criminosos > mediana
+areas_com_mais_criminosos = criminosos_por_area[criminosos_por_area > mediana_criminosos_por_area].index
+quantidade_crimes_areas_mais_criminosos = crimes[crimes['Community Area'].isin(areas_com_mais_criminosos)]
+print("Community Areas com mais criminosos sexuais registrados que a mediana:", list(areas_com_mais_criminosos))
+print("Número de crimes nessas áreas:", len(quantidade_crimes_areas_mais_criminosos))
+# Seleção das areas com número de criminosos <= mediana
+areas_com_menos_igual_criminosos = criminosos_por_area[criminosos_por_area <= mediana_criminosos_por_area].index
+quantidade_crimes_areas_menos_igual_criminosos = crimes[crimes['Community Area'].isin(areas_com_menos_igual_criminosos)]
+print("Community Areas com criminosos sexuais registrados menor ou igual à mediana:", list(areas_com_menos_igual_criminosos))
+print("Número de crimes nessas áreas:", len(quantidade_crimes_areas_menos_igual_criminosos))
+# Contagem do total de crimes na cidade
+total_crimes = len(crimes)
+print("Número total de crimes na cidade:", total_crimes)
+# Cálculo da probabilidade para áreas com mais criminosos que a mediana
+probabilidade_mais_criminosos = len(quantidade_crimes_areas_mais_criminosos) / total_crimes
+print(f"Probabilidade de ocorrer um crime em 'Community Area' com criminosos sexuais > mediana: {probabilidade_mais_criminosos:.4f}")
+# Cálculo da probabilidade para áreas com criminosos <= mediana
+probabilidade_menos_igual_criminosos = len(quantidade_crimes_areas_menos_igual_criminosos) / total_crimes
+print(f"Probabilidade de ocorrer um crime em 'Community Area' com criminosos sexuais <= mediana: {probabilidade_menos_igual_criminosos:.4f}")
+# Comparação
+if probabilidade_mais_criminosos > probabilidade_menos_igual_criminosos:
+    print("Há maior probabilidade de ocorrência de crimes nas áreas com mais criminosos sexuais que a mediana.")
+elif probabilidade_mais_criminosos < probabilidade_menos_igual_criminosos:
+    print("Há maior probabilidade de ocorrência de crimes nas áreas com criminosos sexuais menores ou iguais à mediana.")
+else:
+    print("A probabilidade de ocorrência de crimes é igual em ambas as categorias.")
+
 """# Há relação entre a tendência no número de crimes sexuais ocorridos com o número de crimes gerais ao longo dos anos?"""
 
 import matplotlib.pyplot as plt
@@ -592,19 +656,38 @@ plt.grid(True)
 plt.show()
 print()
 #Teste de shapiro - normalidade
+alpha = 0.05
+
 print("Normalidade - Taxa de Resolução de Crimes Sexuais:")
-print(shapiro(taxa_sexuais.values))
+resultado_sexuais = shapiro(taxa_sexuais.values)
+print(resultado_sexuais)
+
+if resultado_sexuais.pvalue < alpha:
+    print("Resultado: Rejeita-se a hipótese nula (H₀). A distribuição NÃO é normal.\n")
+else:
+    print("Resultado: Não se rejeita a hipótese nula (H₀). A distribuição pode ser considerada normal.\n")
 print()
 print("Normalidade - Taxa de Resolução de Crimes Gerais:")
-print(shapiro(taxa_gerais.values))
+resultado_gerais = shapiro(taxa_gerais.values)
+print(resultado_gerais)
+
+if resultado_gerais.pvalue < alpha:
+    print("Resultado: Rejeita-se a hipótese nula (H₀). A distribuição NÃO é normal.\n")
+else:
+    print("Resultado: Não se rejeita a hipótese nula (H₀). A distribuição pode ser considerada normal.\n")
+
 print()
 #Teste t pareado
-from scipy.stats import ttest_rel
-
 stat, p = ttest_rel(taxa_sexuais.values, taxa_gerais.values)
 print(f"Teste t pareado:")
 print(f"Estatística t: {stat}")
 print(f"p-valor: {p}")
+
+alpha = 0.05
+if p < alpha:
+    print("Resultado: Hipótese nula (H₀) rejeitada.Há diferença significativa nas taxas médias de resolução entre crimes sexuais e crimes gerais.\n")
+else:
+    print("Resultado: Hipótese nula (H₀) não pode ser rejeitada.Não há diferença significativa nas taxas médias de resolução entre crimes sexuais e crimes gerais.\n")
 
 """# A média anual de crimes é diferente entre as “Community Areas” com uma proporção maior de criminosos sexuais e aqueles com uma proporção menor?
 
@@ -625,21 +708,41 @@ crimes_nas_areas_alta = crimes[crimes['Community Area'].isin(areas_alta_concentr
 media_anual_crimes_alta = crimes_nas_areas_alta.groupby('Year').size().mean()
 print(f"Média anual de crimes gerais nas Community Areas com alta concentração de criminosos sexuais: {media_anual_crimes_alta:.2f}")
 #Teste de shapiro - normalidade
+alpha = 0.05
 print("Normalidade - Áreas com baixa concentração:")
-print(shapiro(crimes_nas_areas_baixa.groupby('Year').size()))
+crimes_nas_areas_baixa_norm= shapiro(crimes_nas_areas_baixa.groupby('Year').size())
+print(crimes_nas_areas_baixa_norm)
+if crimes_nas_areas_baixa_norm.pvalue < alpha:
+    print("Resultado: Hipótese nula (H₀) rejeitada. A distribuição NÃO é normal.\n")
+else:
+    print("Resultado: Hipótese nula (H₀) não pode ser rejeitada. A distribuição é normal.\n")
+
 print("Normalidade - Áreas com alta concentração:")
-print(shapiro(crimes_nas_areas_alta.groupby('Year').size()))
+crimes_nas_areas_alta_norm= shapiro(crimes_nas_areas_alta.groupby('Year').size())
+print(crimes_nas_areas_alta_norm)
+if crimes_nas_areas_alta_norm.pvalue < alpha:
+    print("Resultado: Hipótese nula (H₀) rejeitada A distribuição NÃO é normal.\n")
+else:
+    print("Resultado: Hipótese nula (H₀) não pode ser rejeitada. A distribuição é normal.\n")
+print()
 # Teste Mann-Whitney U
 media_anual_baixa = crimes_nas_areas_baixa.groupby('Year').size()
 media_anual_alta = crimes_nas_areas_alta.groupby('Year').size()
 stat, p = mannwhitneyu(media_anual_baixa, media_anual_alta, alternative='two-sided')
 print(f'Teste de Mann-Whitney U:\nEstatística U = {stat}, p-valor = {p}')
 
+alpha = 0.05
+if p < alpha:
+    print("Resultado: Hipótese nula (H₀) rejeitada.A distribuição da média anual de crimes nas “Community Areas” com alta concentração é diferente da das “Community Areas” com baixa concentração..\n")
+else:
+    print("Resultado: Hipótese nula (H₀) não pode ser rejeitada.A distribuição da média anual de crimes nas “Community Areas” com alta concentração de criminosos sexuais é igual à das “Community Areas” com baixa concentração..\n")
+
 """# A probabilidade de um crime sexual ocorrer em uma “Community Area” na qual existe mais de um criminoso sexual registrado é maior que nas “Community Areas” com um ou nenhum criminoso sexual registrado?
 
 """
 
-from statsmodels.stats.proportion import proportions_ztest
+from scipy.stats import chi2_contingency
+import matplotlib.pyplot as plt
 
 #Separação das áreas com mais ou menos de 1 criminoso sexual registrado
 areas_mais_de_um_criminoso = criminosos_por_area[criminosos_por_area > 1].index
@@ -661,35 +764,25 @@ prob_menor = total_crimes_menor / total_crimes_sexuais
 print(f"Probabilidade de um crime sexual ocorrer em “Community Areas” com mais de 1 criminoso registrado: {prob_maior:.2f}")
 print(f"Probabilidade de um crime sexual ocorrer em “Community Areas” com 1 ou nenhum criminoso registrado: {prob_menor:.2f}")
 
-counts = [total_crimes_maior, total_crimes_menor]
-nobs = [total_crimes_sexuais, total_crimes_sexuais]
-#Teste Z
-stat, p_value = proportions_ztest(counts, nobs, alternative='larger')
+#Tabela Contigência para o teste
+tabela = [
+    [total_crimes_maior, total_crimes_sexuais - total_crimes_maior],
+    [total_crimes_menor, total_crimes_sexuais - total_crimes_menor]
+]
 
-print(f"\nTeste Z para Duas Proporções:")
-print(f"Estatística Z: {stat}")
+# Teste Qui-Quadrado
+chi2, p_value, dof, expected = chi2_contingency(tabela)
+
+print(f"\nTeste Qui-Quadrado:")
+print(f"Estatística Qui²: {chi2}")
 print(f"P-valor: {p_value}")
+print(f"Graus de liberdade: {dof}")
 
-"""# Qual a probabilidade de um crime ocorrer em uma “Community Area” que possui um número de criminosos sexuais maior que a mediana?
-
-"""
-
-# Separação das "Community Areas" comparando com a mediana
-criminosos_por_area = criminosos_validos['Community Area'].value_counts().sort_index()
-mediana_criminosos_por_area= criminosos_por_area.median()
-print('Mediana de criminosos por Community Area:', mediana_criminosos_por_area)
-areas_com_mais_criminosos = criminosos_por_area[criminosos_por_area > mediana_criminosos_por_area].index
-quantidade_crimes_areas_criminosos = crimes[crimes['Community Area'].isin(areas_com_mais_criminosos)]
-
-print("Community Areas com mais criminosos sexuais registrados que a mediana:", list(areas_com_mais_criminosos))
-print("Número de crimes nessas áreas:", len(quantidade_crimes_areas_criminosos))
-
-# Contagem do total de crimes na cidade
-total_crimes = len(crimes)
-
-# Cálculo da Probabilidade
-probabilidade_crime= len(quantidade_crimes_areas_criminosos)/total_crimes
-print(f"Probabilidade de ocorrer um crime aleatório em uma 'Community Area' com mais criminosos sexuais registrados que a mediana: {probabilidade_crime:.4f}")
+alpha = 0.05
+if p_value < alpha:
+    print("Resultado: Rejeita-se a hipótese nula (H₀).A proporção em áreas com mais de 1 criminoso é maior que nas demais áreas.\n")
+else:
+    print("Resultado: Não se rejeita a hipótese nula (H₀).As proporções são iguais ou a proporção na área com mais criminosos não é maior. \n")
 
 """# A probabilidade de um crime sexual ocorrer em uma "Community Area" com alta concentração de criminosos sexuais registrados é significativamente maior do que em uma "Community Area" com baixa concentração de criminosos sexuais registrados?
 
@@ -722,3 +815,9 @@ stat, p = proportions_ztest(counts, nobs, alternative='larger')
 print(f"\nTeste Z para as duas áreas:")
 print(f"Estatística Z = {stat}")
 print(f"p-valor = {p}")
+
+alpha = 0.05
+if p < alpha:
+    print("Resultado: Rejeita-se a hipótese nula (H₀). A probabilidade de ocorrer um crime sexual em áreas com alta concentração de criminosos sexuais registrados é menor à probabilidade em áreas com baixa concentração.\n")
+else:
+    print("Resultado: Não se rejeita a hipótese nula (H₀). A probabilidade de ocorrer um crime sexual em áreas com alta concentração é maior do que em áreas com baixa concentração.\n")
