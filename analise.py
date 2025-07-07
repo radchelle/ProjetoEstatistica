@@ -357,6 +357,7 @@ display(
 """#  Existem "Community Areas" em Chicago com alta frequência de crimes gerais e alta concentração de criminosos sexuais simultaneamente?"""
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Contagem de crimes totais por Community
 crimes_validos = crimes.dropna(subset=['Community Area'])
@@ -374,8 +375,12 @@ df_comparativo = pd.DataFrame({
     'Total Crimes': crimes_por_area,
     'Sex Offenders': criminosos_por_area
 })
+x = np.arange(len(df_comparativo.index))
+width = 0.4
 fig, ax1 = plt.subplots(figsize=(15, 6))
-ax1.bar(df_comparativo.index.astype(str), df_comparativo['Total Crimes'], color='blue', width=0.4, label='Total Crimes')
+ax1.bar(x - width/2, df_comparativo['Total Crimes'], width, color='blue', label='Total Crimes')
+ax1.set_xticks(x)
+ax1.set_xticklabels(df_comparativo.index.astype(str), rotation=90)
 ax1.set_xlabel('Community Area')
 ax1.set_ylabel('Total Crimes', color='blue')
 ax1.tick_params(axis='y', labelcolor='blue')
