@@ -19,6 +19,15 @@ crimes = pd.read_csv('/content/drive/MyDrive/estatistica/Crimes_2001_to_Present_
 
 # -- TRATAMENTO DOS DADOS -- #
 
+sex_offenders_colunas_criticas = ['BIRTH DATE', 'BLOCK', 'GENDER', 'RACE']
+sex_offenders.dropna(subset=sex_offenders_colunas_criticas, inplace=True)
+
+#Remove community area inválida
+crimes['Community Area'] = pd.to_numeric(crimes['Community Area'], errors='coerce')
+crimes = crimes[crimes['Community Area'] > 0].copy()
+
+crimes_colunas_criticas = ['Date', 'Block', 'Community Area', 'Primary Type']
+crimes.dropna(subset=crimes_colunas_criticas, inplace=True)
 sex_offenders['GENDER'] = sex_offenders['GENDER'].astype('category')
 sex_offenders['RACE'] = sex_offenders['RACE'].astype('category')
 sex_offenders['BIRTH DATE'] = pd.to_datetime(sex_offenders['BIRTH DATE'], format='%m/%d/%Y', errors='coerce')
@@ -36,18 +45,6 @@ print(sex_offenders.info())
 print(sex_offenders.columns)
 print(crimes.head())
 print(crimes.info())
-
-#Tratamento de valores nulos
-sex_offenders_colunas_criticas = ['BIRTH DATE', 'BLOCK', 'GENDER', 'RACE']
-sex_offenders.dropna(subset=sex_offenders_colunas_criticas, inplace=True)
-
-crimes_colunas_criticas = ['Date', 'Block', 'Community Area', 'Primary Type']
-crimes.dropna(subset=crimes_colunas_criticas, inplace=True)
-
-# Remover Community Area inválida
-crimes['Community Area'] = crimes['Community Area'].astype(int)
-crimes = crimes[crimes['Community Area'] != 0]
-crimes['Community Area'] = crimes['Community Area'].astype('category')
 
 # Adiciona mapeamento de 'Community Area' no dataset 'Sex_offenders'
 
