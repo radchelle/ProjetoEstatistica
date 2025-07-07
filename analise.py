@@ -85,7 +85,7 @@ criminosos_por_area.plot(kind='bar', color='skyblue')
 plt.title("Quantidade de Criminosos Sexuais Registrados por Community Area", fontsize=16)
 plt.xlabel("Community Area", fontsize=14)
 plt.ylabel("Número de Criminosos Registrados", fontsize=14)
-plt.xticks(rotation=90)  # Rotaciona para evitar sobreposição
+plt.xticks(rotation=90)
 plt.tight_layout()
 plt.show()
 print()
@@ -136,7 +136,6 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 #tabela de contingência
-
 bins = [0, 20, 30, 40, 50, 60, 70, 80, 100]
 labels = ['0-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80+']
 sex_offenders['Faixa Etária'] = pd.cut(sex_offenders['IDADE'], bins=bins, labels=labels, right=False)
@@ -651,7 +650,7 @@ taxa_sexuais = pd.Series(index=anos, dtype=float)
 taxa_gerais = pd.Series(index=anos, dtype=float)
 # Calculo da taxa para cada ano
 for ano in anos:
-    total_sex = reportados_sexuais.get(ano, 0)  # Se não houver registros, usar 0
+    total_sex = reportados_sexuais.get(ano, 0)
     resolvidos_sex = resolvidos_sexuais.get(ano, 0)
     taxa_sexuais[ano] = (resolvidos_sex / total_sex) * 100 if total_sex != 0 else 0
     total_geral = reportados_gerais.get(ano, 0)
@@ -799,7 +798,6 @@ prob_maior = total_crimes_maior / total_crimes_sexuais
 prob_menor = total_crimes_menor / total_crimes_sexuais
 print(f"Proporção de crimes sexuais em “Community Areas” com mais de 1 criminoso registrado: {prob_maior:.2f}")
 print(f"Proporção de crimes sexuais em “Community Areas” com 1 ou nenhum criminoso registrado: {prob_menor:.2f}")
-
 #Tabela Contigência para o teste
 tabela = [
     [total_crimes_maior, total_crimes_sexuais - total_crimes_maior],
